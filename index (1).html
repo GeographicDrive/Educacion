@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 Estudio 8vo Básico</title>
+
+<!-- Tailwind (CDN, gratis) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Chart.js (CDN, gratis) para gráfico de progreso -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<!-- PDF.js (CDN, gratis) para poder previsualizar los PDF sin salir de la página -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- Font Awesome (CDN, gratis) para íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<!-- Google Fonts (gratis) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body{font-family:'Nunito',sans-serif;}
+  h1,h2,h3,.font-title{font-family:'Fredoka',sans-serif;}
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:10px;}
+  .tab-btn.active{box-shadow:inset 0 -4px 0 0 currentColor;}
+  details > summary{cursor:pointer;}
+  details[open] summary .chevron{transform:rotate(90deg);}
+  .chevron{transition:transform .2s;}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+<!-- HEADER -->
+<header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <i class="fa-solid fa-graduation-cap text-3xl"></i>
+      <div>
+        <h1 class="text-2xl font-title font-bold leading-none">Trucillo de Estudio 8°</h1>
+        <p class="text-xs opacity-90">Libros + Objetivos de Aprendizaje (OA) en un solo lugar</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <div class="text-right">
+        <p class="opacity-90">Progreso total</p>
+        <p id="global-percent" class="text-xl font-bold">0%</p>
+      </div>
+      <div class="w-16 h-16"><canvas id="globalChart"></canvas></div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<nav class="bg-white shadow sticky top-[84px] z-30 overflow-x-auto">
+  <div class="max-w-6xl mx-auto flex gap-1 px-2" id="tabs"></div>
+</nav>
+
+<main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+  <!-- Buscador -->
+  <div class="bg-white rounded-2xl shadow p-4 flex flex-col sm:flex-row gap-3 items-center">
+    <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+    <input id="search" type="text" placeholder="Busca un objetivo por palabra clave (ej: 'ecuaciones', 'célula', 'renacimiento')..."
+      class="flex-1 outline-none px-2 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-indigo-400 w-full">
+    <button onclick="clearSearch()" class="text-xs text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i> limpiar</button>
+  </div>
+
+  <!-- Configuración API Key Groq -->
+  <div class="bg-white rounded-2xl shadow p-4">
+    <div class="flex items-center justify-between flex-wrap gap-2 cursor-pointer" onclick="document.getElementById('apikey-body').classList.toggle('hidden')">
+      <h3 class="font-title font-bold text-slate-700 flex items-center gap-2">
+        <i class="fa-solid fa-key text-yellow-500"></i> Configuración de IA (Groq API Key)
+      </h3>
+      <span id="apikey-status" class="text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-600">Sin configurar</span>
+    </div>
+    <div id="apikey-body" class="mt-3 space-y-2">
+      <p class="text-xs text-slate-500">
+        Consigue una API key gratis en <a href="https://console.groq.com/keys" target="_blank" class="text-indigo-600 underline">console.groq.com/keys</a>.
+        Se guarda solo en <b>este navegador</b> (localStorage), nunca se envía a nadie más que a Groq.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input id="groq-key-input" type="password" placeholder="gsk_..." class="flex-1 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-indigo-400 outline-none text-sm">
+        <button onclick="toggleKeyVisibility()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm"><i class="fa-solid fa-eye" id="eye-icon"></i></button>
+        <button onclick="saveGroqKey()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+        <button onclick="clearGroqKey()" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-semibold"><i class="fa-solid fa-trash"></i> Borrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content"></div>
+
+  <!-- Visor de PDF -->
+  <section id="pdf-section" class="bg-white rounded-2xl shadow p-5 hidden">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-title font-bold" id="pdf-title"><i class="fa-solid fa-book-open text-rose-500"></i> Visor de libro</h2>
+      <div class="flex items-center gap-2">
+        <button onclick="pdfPrev()" class="px-3 py-1 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-chevron-left"></i></button>
+        <span class="text-sm" id="pdf-page-info">- / -</span>
+        <button onclick="pdfNext()" class="px-3 py-1 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-chevron-right"></i></button>
+        <a id="pdf-download" href="#" download class="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm"><i class="fa-solid fa-download"></i></a>
+      </div>
+    </div>
+    <div class="w-full overflow-auto bg-slate-50 rounded-xl border flex justify-center p-2">
+      <canvas id="pdf-canvas"></canvas>
+    </div>
+    <p class="text-xs text-slate-400 mt-2">Nota: el PDF debe estar en la misma carpeta que este archivo HTML (mismo nombre que en tu repositorio) para poder visualizarse aquí.</p>
+  </section>
+
+</main>
+
+<footer class="text-center text-xs text-slate-400 py-8">
+  Hecho con 💜 para sacarte las mejores notas · Datos: Currículum MINEDUC Chile 8° Básico
+</footer>
+
+<script>
+/* ============================================================
+   DATOS: asignaturas, archivos y objetivos de aprendizaje (OA)
+   ============================================================ */
+const SUBJECTS = {
+  matematicas: {
+    name: "Matemáticas", icon: "fa-square-root-variable", color: "sky",
+    pdf: "matematicas.pdf",
+    oas: [
+      ["MA08 OA 01","Comprender la multiplicación y división de números enteros (representación concreta, pictórica y simbólica, regla de los signos, resolución de problemas)."],
+      ["MA08 OA 02","Multiplicación y división con números racionales en la resolución de problemas, usando la recta numérica y distintos conjuntos numéricos."],
+      ["MA08 OA 03","Explicar la multiplicación, división y formación de potencias de base natural y exponente hasta 3."],
+      ["MA08 OA 04","Comprender las raíces cuadradas de números naturales: estimación, representación y aplicación."],
+      ["MA08 OA 05","Resolver problemas de variaciones porcentuales (ej: interés anual del ahorro)."],
+      ["MA08 OA 06","Comprender operaciones de expresiones algebraicas, relacionándolas con áreas y volúmenes, y factorización."],
+      ["MA08 OA 07","Comprender la noción de función por medio de un cambio lineal (tablas, máquinas, reglas x-y, gráficos)."],
+      ["MA08 OA 08","Modelar situaciones con ecuaciones lineales de distintas formas (ax=b, ax+b=c, etc.)."],
+      ["MA08 OA 09","Resolver inecuaciones lineales con coeficientes racionales."],
+      ["MA08 OA 10","Comprender la función afín y su relación con el interés simple."],
+      ["MA08 OA 11","Fórmulas de área de superficie y volumen de prismas rectos y cilindros."],
+      ["MA08 OA 12","Explicar y aplicar el teorema de Pitágoras."],
+      ["MA08 OA 13","Describir posición y movimiento (traslaciones, rotaciones, reflexiones) en 2D."],
+      ["MA08 OA 14","Componer rotaciones, traslaciones y reflexiones; simetría de polígonos y poliedros."],
+      ["MA08 OA 15","Comprender medidas de posición, percentiles y cuartiles (diagrama de cajón)."],
+      ["MA08 OA 16","Evaluar cómo se presentan los datos gráficamente y detectar manipulaciones."],
+      ["MA08 OA 17","Explicar el principio combinatorio multiplicativo y su uso en probabilidad."],
+    ]
+  },
+  lenguaje: {
+    name: "Lenguaje", icon: "fa-book", color: "amber",
+    pdf: "lenguaje.pdf",
+    oas: [
+      ["LE08 OA 01","Leer habitualmente para aprender y recrearse, seleccionando textos según preferencias."],
+      ["LE08 OA 02","Reflexionar sobre la experiencia humana a partir de obras literarias."],
+      ["LE08 OA 03","Analizar narraciones: conflicto, personajes, narrador, tópicos literarios, prejuicios y estereotipos."],
+      ["LE08 OA 04","Analizar poemas: lenguaje poético, lenguaje figurado, repeticiones."],
+      ["LE08 OA 05","Analizar textos dramáticos: conflicto, personajes, diferencia obra dramática/teatral."],
+      ["LE08 OA 06","Leer y comprender fragmentos de epopeya."],
+      ["LE08 OA 07","Leer y comprender comedias teatrales."],
+      ["LE08 OA 08","Formular interpretaciones de textos literarios."],
+      ["LE08 OA 09","Analizar y evaluar textos argumentativos (columnas, cartas, discursos)."],
+      ["LE08 OA 10","Analizar textos de medios de comunicación (noticias, reportajes, publicidad)."],
+      ["LE08 OA 11","Leer textos no literarios para contextualizar lecturas literarias."],
+      ["LE08 OA 12","Aplicar estrategias de comprensión lectora (resumir, preguntar, analizar multimodalidad)."],
+      ["LE08 OA 13","Expresarse creativamente por escrito en diversos géneros."],
+      ["LE08 OA 14","Escribir textos explicativos (artículos, informes, reportajes)."],
+      ["LE08 OA 15","Escribir textos persuasivos breves (cartas al director, editoriales)."],
+      ["LE08 OA 16","Planificar, escribir, revisar y editar textos según contexto y propósito."],
+      ["LE08 OA 17","Usar adecuadamente oraciones complejas."],
+      ["LE08 OA 18","Construir textos con referencias claras (correferencia)."],
+      ["LE08 OA 19","Conocer y seleccionar modos verbales según el efecto buscado."],
+      ["LE08 OA 20","Escribir correctamente aplicando reglas ortográficas y de puntuación."],
+      ["LE08 OA 21","Comprender y evaluar textos orales y audiovisuales."],
+      ["LE08 OA 22","Dialogar constructivamente para debatir o explorar ideas."],
+      ["LE08 OA 23","Expresarse frente a una audiencia de forma clara."],
+      ["LE08 OA 24","Usar conscientemente elementos que configuran textos orales."],
+      ["LE08 OA 25","Realizar investigaciones sobre diversos temas."],
+      ["LE08 OA 26","Sintetizar y ordenar ideas principales de textos escuchados o leídos."],
+    ]
+  },
+  ingles: {
+    name: "Inglés", icon: "fa-earth-americas", color: "emerald",
+    pdf: "ingles1.pdf",
+    pdf2: "ingles2.pdf",
+    oas: [
+      ["IN08 OA 01","Comprender ideas generales e información explícita en textos orales sobre temas variados."],
+      ["IN08 OA 02","Identificar palabras clave, conectores y sonidos específicos (/ð/, /θ/, /w/, /r/, terminaciones -ed)."],
+      ["IN08 OA 03","Identificar propósito, información específica, secuencia y relaciones causa-efecto en textos escuchados."],
+      ["IN08 OA 04","Usar estrategias de comprensión auditiva (predicciones, conocimientos previos, resumen)."],
+      ["IN08 OA 05","Presentar información oral usando recursos multimodales."],
+      ["IN08 OA 06","Participar en interacciones y exposiciones con estrategias de fluidez y claridad."],
+      ["IN08 OA 07","Reaccionar a textos leídos/escuchados haciendo conexiones y opinando."],
+      ["IN08 OA 08","Demostrar uso del lenguaje: cantidades, gustos, comparaciones, tiempo, predicciones, condiciones."],
+      ["IN08 OA 09","Comprender ideas generales e información explícita en textos escritos."],
+      ["IN08 OA 10","Comprender textos no literarios (descripciones, emails, biografías, gráficos)."],
+      ["IN08 OA 11","Comprender textos literarios (canciones, cuentos, novelas adaptadas)."],
+      ["IN08 OA 12","Usar estrategias de comprensión lectora (pre-lectura, lectura, pos-lectura)."],
+      ["IN08 OA 13","Escribir historias e información relevante usando recursos multimodales."],
+      ["IN08 OA 14","Escribir textos breves siguiendo el proceso de escritura."],
+      ["IN08 OA 15","Escribir para informar, opinar y narrar con conectores y ortografía correcta."],
+      ["IN08 OA 16","Demostrar uso del lenguaje escrito: cantidades, gustos, comparaciones, tiempo, condiciones."],
+    ]
+  },
+  historia: {
+    name: "Historia", icon: "fa-landmark", color: "rose",
+    pdf: "historia.pdf",
+    oas: [
+      ["HI08 OA 01","Analizar la centralidad del ser humano en el Humanismo y Renacimiento."],
+      ["HI08 OA 02","Comparar la sociedad medieval y moderna (ruptura religiosa, Estado, imprenta, ciencia)."],
+      ["HI08 OA 03","Caracterizar el Estado moderno (poder real, burocracia, ejércitos, comercio)."],
+      ["HI08 OA 04","Caracterizar la economía mercantilista del siglo XVI."],
+      ["HI08 OA 05","Argumentar el enfrentamiento cultural entre europeos y americanos."],
+      ["HI08 OA 06","Analizar factores de la rapidez de la conquista de los imperios americanos."],
+      ["HI08 OA 07","Evaluar el impacto de la conquista de América en la cultura europea."],
+      ["HI08 OA 08","Analizar el rol de la ciudad en la administración del Imperio español."],
+      ["HI08 OA 09","Caracterizar el barroco en la sociedad colonial."],
+      ["HI08 OA 10","Explicar la importancia de los mercados americanos en el comercio atlántico."],
+      ["HI08 OA 11","Analizar la formación de la sociedad colonial americana (evangelización, esclavitud, mestizaje)."],
+      ["HI08 OA 12","Analizar la sociedad de frontera en la Araucanía colonial."],
+      ["HI08 OA 13","Analizar el rol de la hacienda en el Chile colonial."],
+      ["HI08 OA 14","Caracterizar la Ilustración y su crítica al absolutismo."],
+      ["HI08 OA 15","Analizar las ideas ilustradas en los procesos revolucionarios (EE.UU., Francia, Latinoamérica)."],
+      ["HI08 OA 16","Explicar la independencia hispanoamericana como proceso continental."],
+      ["HI08 OA 17","Contrastar posturas sobre la legitimidad de la conquista y su relación con los DD.HH."],
+      ["HI08 OA 18","Explicar los derechos del hombre y del ciudadano y su vigencia actual."],
+      ["HI08 OA 19","Evaluar las transformaciones que generó la independencia de Chile."],
+      ["HI08 OA 20","Explicar criterios que definen una región (física y humana)."],
+      ["HI08 OA 21","Analizar problemas de conexión/aislamiento regional en Chile."],
+      ["HI08 OA 22","Aplicar el concepto de desarrollo a las regiones de Chile."],
+    ]
+  },
+  ciencias: {
+    name: "Ciencias", icon: "fa-flask", color: "violet",
+    pdf: "ciencias.pdf",
+    oas: [
+      ["CN08 OA 01","Explicar la evolución de los modelos de la célula (Hooke, Leeuwenhoek, Virchow, Schleiden, Schwann)."],
+      ["CN08 OA 02","Modelos que relacionan la función de la célula con sus partes."],
+      ["CN08 OA 03","Explicar el intercambio de partículas por difusión y ósmosis."],
+      ["CN08 OA 04","Modelos de estructuras especializadas de las plantas frente a estímulos."],
+      ["CN08 OA 05","Explicar la interacción de sistemas del cuerpo humano (digestivo, circulatorio, respiratorio, excretor)."],
+      ["CN08 OA 06","Investigar nutrientes en los alimentos y sus efectos en la salud."],
+      ["CN08 OA 07","Analizar factores para mantener un cuerpo saludable."],
+      ["CN08 OA 08","Analizar fuerzas eléctricas y métodos de electrización."],
+      ["CN08 OA 09","Investigar tecnologías de generación de energía eléctrica."],
+      ["CN08 OA 10","Analizar circuitos eléctricos domiciliarios en serie y paralelo."],
+      ["CN08 OA 11","Modelos sobre el calor como transferencia de energía térmica."],
+      ["CN08 OA 12","Evolución del conocimiento de la constitución de la materia (Dalton, Thomson, Rutherford, Bohr)."],
+      ["CN08 OA 13","Modelos que expliquen que la materia está constituida por átomos."],
+      ["CN08 OA 14","Usar la tabla periódica como modelo predictivo de propiedades."],
+      ["CN08 OA 15","Argumentar sobre elementos químicos frecuentes en la Tierra y soporte de la vida (C, H, O, N)."],
+    ]
+  }
+};
+
+/* ============================================================
+   ESTADO (en memoria, sin localStorage)
+   ============================================================ */
+let state = {};
+Object.keys(SUBJECTS).forEach(k=>{
+  state[k] = SUBJECTS[k].oas.map(()=>false);
+});
+
+/* ============================================================
+   RENDER TABS
+   ============================================================ */
+const tabsEl = document.getElementById('tabs');
+const contentEl = document.getElementById('content');
+let activeTab = Object.keys(SUBJECTS)[0];
+
+function colorClasses(color, active){
+  const map = {
+    sky:   active? "text-sky-600 bg-sky-50" : "text-slate-500",
+    amber: active? "text-amber-600 bg-amber-50" : "text-slate-500",
+    emerald: active? "text-emerald-600 bg-emerald-50" : "text-slate-500",
+    rose: active? "text-rose-600 bg-rose-50" : "text-slate-500",
+    violet: active? "text-violet-600 bg-violet-50" : "text-slate-500",
+  };
+  return map[color];
+}
+
+function renderTabs(){
+  tabsEl.innerHTML = '';
+  Object.entries(SUBJECTS).forEach(([key, s])=>{
+    const btn = document.createElement('button');
+    btn.className = `tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap rounded-t-lg transition ${colorClasses(s.color, key===activeTab)} ${key===activeTab?'active':''}`;
+    btn.innerHTML = `<i class="fa-solid ${s.icon}"></i> ${s.name} <span class="text-[10px] bg-slate-200 text-slate-600 rounded-full px-2 py-0.5" id="badge-${key}"></span>`;
+    btn.onclick = ()=>{ activeTab = key; renderTabs(); renderContent(); };
+    tabsEl.appendChild(btn);
+  });
+  updateBadges();
+}
+
+function updateBadges(){
+  Object.keys(SUBJECTS).forEach(key=>{
+    const done = state[key].filter(Boolean).length;
+    const total = state[key].length;
+    const b = document.getElementById(`badge-${key}`);
+    if(b) b.textContent = `${done}/${total}`;
+  });
+  updateGlobal();
+}
+
+/* ============================================================
+   RENDER CONTENT (por asignatura)
+   ============================================================ */
+function renderContent(){
+  const s = SUBJECTS[activeTab];
+  const doneCount = state[activeTab].filter(Boolean).length;
+  const pct = Math.round((doneCount/s.oas.length)*100);
+
+  let pdfButtons = `<button onclick="openPdf('${s.pdf}','${s.name}')" class="bg-${s.color}-600 hover:opacity-90 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-book-open"></i> Abrir ${s.pdf}</button>`;
+  if(s.pdf2){
+    pdfButtons += `<button onclick="openPdf('${s.pdf2}','${s.name} (2)')" class="bg-${s.color}-500 hover:opacity-90 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-book"></i> Abrir ${s.pdf2}</button>`;
+  }
+
+  contentEl.innerHTML = `
+  <section class="bg-white rounded-2xl shadow p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="text-2xl font-title font-bold flex items-center gap-2 text-${s.color}-600">
+        <i class="fa-solid ${s.icon}"></i> ${s.name}
+      </h2>
+      <div class="flex flex-wrap gap-2">${pdfButtons}</div>
+    </div>
+
+    <div class="mb-4">
+      <div class="flex justify-between text-xs text-slate-500 mb-1">
+        <span>Progreso de objetivos</span><span>${doneCount}/${s.oas.length} (${pct}%)</span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-3">
+        <div class="bg-${s.color}-500 h-3 rounded-full transition-all" style="width:${pct}%"></div>
+      </div>
+    </div>
+
+    <div class="space-y-2" id="oa-list"></div>
+  </section>`;
+
+  const list = document.getElementById('oa-list');
+  s.oas.forEach((oa, idx)=>{
+    const [code, desc] = oa;
+    const rowId = `oa-${activeTab}-${idx}`;
+    const row = document.createElement('div');
+    row.className = `p-3 rounded-xl border transition oa-row ${state[activeTab][idx]?'bg-emerald-50 border-emerald-200':'bg-slate-50 border-slate-200'}`;
+    row.dataset.text = (code + ' ' + desc).toLowerCase();
+    row.innerHTML = `
+      <div class="flex items-start gap-3">
+        <input type="checkbox" ${state[activeTab][idx]?'checked':''} class="mt-1 w-5 h-5 accent-${s.color}-600 cursor-pointer"
+          onchange="toggleOA('${activeTab}', ${idx})">
+        <div class="flex-1">
+          <p class="font-bold text-sm text-${s.color}-700">${code}</p>
+          <p class="text-sm text-slate-700">${desc}</p>
+        </div>
+        <button onclick="generateExercise('${activeTab}', ${idx}, '${rowId}')" id="btn-${rowId}"
+          class="shrink-0 bg-${s.color}-600 hover:bg-${s.color}-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1 whitespace-nowrap">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Generar ejercicio
+        </button>
+      </div>
+      <div id="ex-${rowId}" class="hidden mt-3 p-3 rounded-lg bg-white border border-dashed border-${s.color}-300 text-sm text-slate-700"></div>`;
+    list.appendChild(row);
+  });
+  applySearch();
+}
+
+/* ============================================================
+   API KEY DE GROQ (persistida en localStorage del navegador)
+   ============================================================ */
+const GROQ_STORAGE_KEY = 'estudio8_groq_api_key';
+
+function getGroqKey(){
+  try{ return localStorage.getItem(GROQ_STORAGE_KEY) || ''; }catch(e){ return ''; }
+}
+function setGroqKey(key){
+  try{ localStorage.setItem(GROQ_STORAGE_KEY, key); }catch(e){}
+}
+function removeGroqKey(){
+  try{ localStorage.removeItem(GROQ_STORAGE_KEY); }catch(e){}
+}
+
+function updateKeyStatusUI(){
+  const key = getGroqKey();
+  const status = document.getElementById('apikey-status');
+  const input = document.getElementById('groq-key-input');
+  if(key){
+    status.textContent = 'Configurada ✓';
+    status.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700';
+    input.value = key;
+  } else {
+    status.textContent = 'Sin configurar';
+    status.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-600';
+    input.value = '';
+  }
+}
+
+function saveGroqKey(){
+  const val = document.getElementById('groq-key-input').value.trim();
+  if(!val){ alert('Escribe tu API key de Groq antes de guardar.'); return; }
+  setGroqKey(val);
+  updateKeyStatusUI();
+  document.getElementById('apikey-body').classList.add('hidden');
+}
+
+function clearGroqKey(){
+  removeGroqKey();
+  updateKeyStatusUI();
+}
+
+function toggleKeyVisibility(){
+  const input = document.getElementById('groq-key-input');
+  const icon = document.getElementById('eye-icon');
+  if(input.type === 'password'){ input.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
+  else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+}
+
+/* ============================================================
+   GENERADOR DE EJERCICIOS (Groq API — https://console.groq.com)
+   ============================================================ */
+async function generateExercise(subject, idx, rowId){
+  const s = SUBJECTS[subject];
+  const [code, desc] = s.oas[idx];
+  const btn = document.getElementById(`btn-${rowId}`);
+  const box = document.getElementById(`ex-${rowId}`);
+  const apiKey = getGroqKey();
+
+  box.classList.remove('hidden');
+
+  if(!apiKey){
+    box.innerHTML = `<p class="text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i>
+      Primero configura tu API key gratis de Groq arriba (sección "Configuración de IA").</p>
+      <button onclick="document.getElementById('apikey-body').classList.remove('hidden'); document.getElementById('apikey-body').scrollIntoView({behavior:'smooth'});"
+        class="mt-2 text-xs text-indigo-600 underline">Ir a configurar mi API key</button>`;
+    return;
+  }
+
+  box.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generando ejercicio para <b>${code}</b>...`;
+  btn.disabled = true;
+  btn.classList.add('opacity-60','cursor-wait');
+
+  const prompt = `Eres un profesor chileno de 8vo básico creando material de estudio.
+Genera UN ejercicio de práctica breve (en español) para la asignatura "${s.name}", basado en este Objetivo de Aprendizaje del currículum MINEDUC:
+"${code}: ${desc}"
+
+Responde EXACTAMENTE con este formato, sin agregar nada más:
+EJERCICIO: <enunciado del ejercicio o pregunta>
+RESPUESTA: <respuesta correcta explicada brevemente>`;
+
+  try{
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8
+      })
+    });
+
+    if(res.status === 401){ throw new Error('unauthorized'); }
+    if(!res.ok){ throw new Error('bad_response'); }
+
+    const data = await res.json();
+    let text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+    text = text.trim();
+
+    let ejercicio = text, respuesta = '';
+    const match = text.match(/EJERCICIO:\s*([\s\S]*?)\s*RESPUESTA:\s*([\s\S]*)/i);
+    if(match){ ejercicio = match[1].trim(); respuesta = match[2].trim(); }
+
+    box.innerHTML = `
+      <p class="font-semibold text-${s.color}-700 mb-1"><i class="fa-solid fa-pen-ruler"></i> Ejercicio</p>
+      <p class="mb-3 whitespace-pre-line">${ejercicio}</p>
+      ${respuesta ? `
+        <button class="text-xs text-${s.color}-600 underline mb-2" onclick="this.nextElementSibling.classList.toggle('hidden')">Mostrar / ocultar respuesta</button>
+        <div class="hidden bg-${s.color}-50 border border-${s.color}-200 rounded-lg p-2 whitespace-pre-line">${respuesta}</div>
+      ` : ''}
+      <button onclick="generateExercise('${subject}', ${idx}, '${rowId}')" class="mt-3 text-xs text-slate-400 hover:text-slate-600">
+        <i class="fa-solid fa-rotate"></i> Generar otro ejercicio
+      </button>`;
+  }catch(err){
+    let msg = 'No se pudo generar el ejercicio. Intenta de nuevo.';
+    if(err.message === 'unauthorized'){
+      msg = 'Tu API key de Groq no es válida o expiró. Revísala en la sección "Configuración de IA".';
+    }
+    box.innerHTML = `<p class="text-red-500"><i class="fa-solid fa-triangle-exclamation"></i> ${msg}</p>
+      <button onclick="generateExercise('${subject}', ${idx}, '${rowId}')" class="mt-2 text-xs text-${s.color}-600 underline">Reintentar</button>`;
+  }finally{
+    btn.disabled = false;
+    btn.classList.remove('opacity-60','cursor-wait');
+  }
+}
+
+function toggleOA(subject, idx){
+  state[subject][idx] = !state[subject][idx];
+  renderContent();
+  updateBadges();
+}
+
+/* ============================================================
+   BUSCADOR
+   ============================================================ */
+document.getElementById('search').addEventListener('input', applySearch);
+function applySearch(){
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  document.querySelectorAll('.oa-row').forEach(row=>{
+    row.style.display = (!q || row.dataset.text.includes(q)) ? 'flex' : 'none';
+  });
+}
+function clearSearch(){ document.getElementById('search').value=''; applySearch(); }
+
+/* ============================================================
+   GRÁFICO GLOBAL (Chart.js)
+   ============================================================ */
+let globalChart;
+function updateGlobal(){
+  let done=0, total=0;
+  Object.keys(state).forEach(k=>{ done += state[k].filter(Boolean).length; total += state[k].length; });
+  const pct = total? Math.round((done/total)*100) : 0;
+  document.getElementById('global-percent').textContent = pct+'%';
+
+  const ctx = document.getElementById('globalChart');
+  const data = { datasets: [{ data:[pct,100-pct], backgroundColor:['#facc15','rgba(255,255,255,0.25)'], borderWidth:0 }] };
+  if(globalChart){ globalChart.data = data; globalChart.update(); }
+  else {
+    globalChart = new Chart(ctx, { type:'doughnut', data, options:{ cutout:'70%', plugins:{legend:{display:false},tooltip:{enabled:false}} } });
+  }
+}
+
+/* ============================================================
+   VISOR DE PDF (pdf.js) — busca el archivo junto al HTML
+   ============================================================ */
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let pdfDoc = null, pdfPageNum = 1;
+
+async function openPdf(filename, title){
+  const section = document.getElementById('pdf-section');
+  section.classList.remove('hidden');
+  document.getElementById('pdf-title').innerHTML = `<i class="fa-solid fa-book-open text-rose-500"></i> ${title} — <span class="text-slate-400 text-sm">${filename}</span>`;
+  document.getElementById('pdf-download').href = filename;
+  section.scrollIntoView({behavior:'smooth'});
+  try{
+    pdfDoc = await pdfjsLib.getDocument(filename).promise;
+    pdfPageNum = 1;
+    renderPdfPage();
+  }catch(err){
+    document.getElementById('pdf-page-info').textContent = 'No se pudo cargar';
+    const canvas = document.getElementById('pdf-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 600; canvas.height = 120;
+    ctx.fillStyle = '#f8fafc'; ctx.fillRect(0,0,600,120);
+    ctx.fillStyle = '#94a3b8'; ctx.font = '16px Nunito';
+    ctx.fillText(`⚠ Coloca "${filename}" en la misma carpeta que este HTML para verlo aquí.`, 20, 60);
+  }
+}
+
+async function renderPdfPage(){
+  if(!pdfDoc) return;
+  const page = await pdfDoc.getPage(pdfPageNum);
+  const viewport = page.getViewport({scale: 1.3});
+  const canvas = document.getElementById('pdf-canvas');
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+  document.getElementById('pdf-page-info').textContent = `${pdfPageNum} / ${pdfDoc.numPages}`;
+}
+function pdfNext(){ if(pdfDoc && pdfPageNum < pdfDoc.numPages){ pdfPageNum++; renderPdfPage(); } }
+function pdfPrev(){ if(pdfDoc && pdfPageNum > 1){ pdfPageNum--; renderPdfPage(); } }
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderTabs();
+renderContent();
+updateKeyStatusUI();
+</script>
+</body>
+</html>
