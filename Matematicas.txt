@@ -1,0 +1,235 @@
+MA08 OA 01
+
+Mostrar que comprenden la multiplicación y la división de números enteros:
+
+Representándolos de manera concreta, pictórica y simbólica.
+
+Aplicando procedimientos usados en la multiplicación y la división de números naturales.
+
+Aplicando la regla de los signos de la operación.
+
+Resolviendo problemas rutinarios y no rutinarios.
+
+MA08 OA 02
+
+Utilizar las operaciones de multiplicación y división con los números racionales en el contexto de la resolución de problemas:
+
+Representándolos en la recta numérica.
+
+Involucrando diferentes conjuntos numéricos (fracciones, decimales y números enteros).
+
+MA08 OA 03
+
+Explicar la multiplicación, la división y el proceso de formar potencias de potencias de base natural y exponente natural hasta 3, de manera concreta, pictórica y simbólica.
+
+MA08 OA 04
+
+Mostrar que comprenden las raíces cuadradas de números naturales:
+
+Estimándolas de manera intuitiva.
+
+Representándolas de manera concreta, pictórica y simbólica.
+
+Aplicándolas en situaciones geométricas y en la vida diaria.
+
+MA08 OA 05
+
+Resolver problemas que involucran variaciones porcentuales en contextos diversos, usando representaciones pictóricas y registrando el proceso de manera simbólica; por ejemplo: el interés anual del ahorro.
+
+MA08 OA 06
+
+Mostrar que comprenden las operaciones de expresiones algebraicas:
+
+Representándolas de manera pictórica y simbólica.
+
+Relacionándolas con el área de cuadrados, rectángulos y volúmenes de paralelepípedos.
+
+Determinando formas factorizadas.
+
+MA08 OA 07
+
+Mostrar que comprenden la noción de función por medio de un cambio lineal:
+
+Utilizando tablas.
+
+Usando metáforas de máquinas.
+
+Estableciendo reglas entre x e y.
+
+Representando de manera gráfica (plano cartesiano, diagramas de venn), de manera manual y/o con software educativo.
+
+MA08 OA 08
+
+Modelar situaciones de la vida diaria y de otras asignaturas, usando ecuaciones lineales de la forma: ax = b; x/a = b, a ≠ 0; ax + b = c; x/a + b = c; ax = b + cx;  a (x + b) = c; ax + b = cx + d (a, b, c, d, e ϵ Q). 
+
+MA08 OA 09
+
+Resolver inecuaciones lineales con coeficientes racionales en el contexto de la resolución de problemas, por medio de representaciones gráficas, simbólicas, de manera manual y/o con software educativo.
+
+MA08 OA 10
+
+Mostrar que comprenden la función afín:
+
+Generalizándola como la suma de una constante con una función lineal.
+
+Trasladando funciones lineales en el plano cartesiano.
+
+Determinando el cambio constante de un intervalo a otro, de manera gráfica y simbólica, de manera manual y/o con software educativo.
+
+Relacionándola con el interés simple.
+
+Utilizándola para resolver problemas de la vida diaria y de otras asignaturas.
+
+MA08 OA 11
+
+Desarrollar las fórmulas para encontrar el área de superficies y el volumen de prismas rectos con diferentes bases y cilindros:
+
+Estimando de manera intuitiva área de superficie y volumen.
+
+Desplegando la red de prismas rectos para encontrar la fórmula del área de superficie aplicando las aproximaciones del perímetro y del área en la resolución de problemas.
+
+Aplicando las aproximaciones del perímetro y del área en la resolución de problemas.
+
+Aplicando las fórmulas a la resolución de problemas geométricos y de la vida diaria.
+
+MA08 OA 12
+
+Explicar, de manera concreta, pictórica y simbólica, la validez del teorema de Pitágoras y aplicar a la resolución de problemas geométricos y de la vida cotidiana, de manera manual y/o con software educativo.
+
+MA08 OA 13
+
+Describir la posición y el movimiento (traslaciones, rotaciones y reflexiones) de figuras 2D, de manera manual y/o con software educativo, utilizando:
+
+Los vectores para la traslación.
+
+Los ejes del plano cartesiano como ejes de reflexión.
+
+Los puntos del plano para las rotaciones.
+
+MA08 OA 14
+
+Componer rotaciones, traslaciones y reflexiones en el plano cartesiano y en el espacio, de manera manual y/o con software educativo, y aplicar a las simetrías de polígonos y poliedros, y a la resolución de problemas geométricos relacionados con el arte.
+
+MA08 OA 15
+
+Mostrar que comprenden las medidas de posición, percentiles y cuartiles:
+
+Identificando la población que está sobre o bajo el percentil.
+
+Representándolas con diagramas, incluyendo el diagrama de cajón, de manera manual y/o con software educativo.
+
+Utilizándolas para comparar poblaciones.
+
+MA08 OA 16
+
+Evaluar la forma en que los datos están presentados:
+
+Comparando la información de los mismos datos representada en distintos tipos de gráficos para determinar fortalezas y debilidades de cada uno.
+
+Representándolas con diagramas, incluyendo el diagrama de cajón, de manera manual y/o con software educativo.
+
+Detectando manipulaciones de gráficos para representar datos.
+
+MA08 OA 17
+
+Explicar el principio combinatorio multiplicativo:
+
+A partir de situaciones concretas.
+
+Representándolo con tablas y árboles regulares, de manera manual y/o con software educativo.
+
+Utilizándolo para calcular la probabilidad de un evento compuesto.
+
+MA08 OAA A
+
+Abordar de manera flexible y creativa la búsqueda de soluciones a problemas de la vida diaria, de la sociedad en general, o propios de otras asignaturas.
+
+MA08 OAA B
+
+Demostrar curiosidad e interés por resolver desafíos matemáticos, con confianza en las propias capacidades, incluso cuando no se consigue un resultado inmediato.
+
+MA08 OAA C
+
+Demostrar interés, esfuerzo, perseverancia y rigor frente a la resolución de problemas y la búsqueda de nuevas soluciones para problemas reales.
+
+MA08 OAA D
+
+Trabajar en equipo, en forma responsable y proactiva, ayudando a los otros, considerando y respetando los aportes de todos, y manifestando disposición a entender sus argumentos en las soluciones de los problemas.
+
+MA08 OAA E
+
+Mostrar una actitud crítica al evaluar las evidencias e informaciones matemáticas y valorar el aporte de los datos cuantitativos en la comprensión de la realidad social.
+
+MA08 OAA F
+
+Usar de manera responsable y efectiva las tecnologías de la comunicación en la obtención de información, dando crédito al trabajo de otros y respetando la propiedad y la privacidad de las personas.
+
+MA08 OAH a
+
+Resolver problemas utilizando estrategias tales como:
+
+Destacar la información dada.
+
+Usar un proceso de ensayo y error sistemático.
+
+Aplicar procesos reversibles.
+
+Descartar información irrelevante.
+
+Usar problemas similares.
+
+MA08 OAH b
+
+Evaluar procedimientos y comprobar resultados propios y de otros, de un problema matemático.
+
+MA08 OAH c
+
+Utilizar sus propias palabras, gráficos y símbolos matemáticos para presentar sus ideas o soluciones.
+
+MA08 OAH d
+
+Describir relaciones y situaciones matemáticas de manera verbal y usando símbolos.
+
+MA08 OAH e
+
+Explicar y fundamentar:
+
+Soluciones propias y los procedimientos utilizados.
+
+Resultados mediante definiciones, axiomas, propiedades y teoremas.
+
+MA08 OAH f
+
+Fundamentar conjeturas dando ejemplos y contraejemplos.
+
+MA08 OAH g
+
+Evaluar la argumentación de otros dando razones.
+
+MA08 OAH h
+
+Usar modelos, realizando cálculos, estimaciones y simulaciones, tanto manualmente como con ayuda de instrumentos para resolver problemas de otras asignaturas y de la vida diaria.
+
+MA08 OAH i
+
+Seleccionar y ajustar modelos, para resolver problemas asociados a ecuaciones e inecuaciones de la forma $$ ax + b &gt;, &lt;, = c, con a, b, c P N $$ comparando dependencias lineales.
+
+MA08 OAH j
+
+Evaluar la pertinencia de modelos:
+
+En relación al problema presentado.
+
+Considerando sus limitaciones.
+
+MA08 OAH k
+
+Elegir y utilizar representaciones concretas, pictóricas y simbólicas para enunciados y situaciones en contextos diversos (tablas, gráficos, recta numérica, entre otros).
+
+MA08 OAH l
+
+Relacionar y contrastar información entre distintos niveles de representación.
+
+MA08 OAH m
+
+Representar y ejemplificar utilizando analogías, metáforas y situaciones familiares para resolver problemas.
