@@ -1,0 +1,16 @@
+{
+  "name": "GeoDrive",
+  "short_name": "GeoDrive",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "icon-513.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
