@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📚 Estudio 8vo Básico</title>
+<title>Educacion</title>
 
-<!-- Tailwind (CDN, gratis) -->
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Chart.js (CDN, gratis) para gráfico de progreso -->
+<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<!-- PDF.js (CDN, gratis) para poder previsualizar los PDF sin salir de la página -->
+<!-- PDF.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<!-- Font Awesome (CDN, gratis) para íconos -->
+<!-- Font Awesome CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<!-- Google Fonts (gratis) -->
+<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -65,7 +65,7 @@
     <button onclick="clearSearch()" class="text-xs text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i> limpiar</button>
   </div>
 
-  <!-- Modal: Configuración API Key Groq -->
+  <!-- Configuración API Key Groq -->
   <div id="apikey-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/50" onclick="closeApiKeyModal()"></div>
     <div class="relative bg-white rounded-2xl shadow-xl p-5 w-full max-w-lg">
@@ -109,19 +109,17 @@
     <div class="w-full overflow-auto bg-slate-50 rounded-xl border flex justify-center p-2">
       <canvas id="pdf-canvas"></canvas>
     </div>
-    <p class="text-xs text-slate-400 mt-2">Nota: el PDF debe estar en la misma carpeta que este archivo HTML (mismo nombre que en tu repositorio) para poder visualizarse aquí.</p>
+    <p class="text-xs text-slate-400 mt-2">PDF de libros.</p>
   </section>
 
 </main>
 
 <footer class="text-center text-xs text-slate-400 py-8">
-  Hecho con 💜 para sacarte las mejores notas · Datos: Currículum MINEDUC Chile 8° Básico
+  Datos: Currículum MINEDUC Chile 8° Básico
 </footer>
 
 <script>
-/* ============================================================
-   DATOS: asignaturas, archivos y objetivos de aprendizaje (OA)
-   ============================================================ */
+/* Datos */
 const SUBJECTS = {
   matematicas: {
     name: "Matemáticas", icon: "fa-square-root-variable", color: "sky",
@@ -252,12 +250,7 @@ const SUBJECTS = {
   }
 };
 
-/* ============================================================
-   ALMACENAMIENTO ROBUSTO
-   Usa localStorage si está disponible. Si el navegador la bloquea
-   (por ejemplo al abrir el archivo directamente con file://), cae
-   a sessionStorage y, en último caso, a memoria + aviso visual.
-   ============================================================ */
+/* Almacenamiento */
 const Storage = (function(){
   let backend = null;
   let memory = {};
@@ -314,9 +307,7 @@ function showStorageWarningIfNeeded(){
   document.querySelector('header').insertAdjacentElement('afterend', banner);
 }
 
-/* ============================================================
-   ESTADO (progreso de objetivos) — persistido
-   ============================================================ */
+/* Estado */
 const STATE_STORAGE_KEY = 'estudio8_state_v1';
 
 function loadState(){
@@ -340,9 +331,7 @@ function persistState(){
 
 let state = loadState();
 
-/* ============================================================
-   RENDER TABS
-   ============================================================ */
+/* Render tabs */
 const tabsEl = document.getElementById('tabs');
 const contentEl = document.getElementById('content');
 let activeTab = Object.keys(SUBJECTS)[0];
@@ -380,9 +369,7 @@ function updateBadges(){
   updateGlobal();
 }
 
-/* ============================================================
-   RENDER CONTENT (por asignatura)
-   ============================================================ */
+/* Render content */
 function renderContent(){
   const s = SUBJECTS[activeTab];
   const doneCount = state[activeTab].filter(Boolean).length;
@@ -441,9 +428,7 @@ function renderContent(){
   applySearch();
 }
 
-/* ============================================================
-   API KEY DE GROQ (persistida en localStorage del navegador)
-   ============================================================ */
+/* API KEY DE GROQ */
 const GROQ_STORAGE_KEY = 'estudio8_groq_api_key';
 
 function getGroqKey(){
@@ -510,12 +495,7 @@ function toggleKeyVisibility(){
   else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
 }
 
-/* ============================================================
-   CACHÉ DE EJERCICIOS GENERADOS (para no gastar API de más)
-   Guarda todos los ejercicios ya generados por objetivo, y
-   siempre que exista al menos uno, se muestra el más reciente
-   sin necesidad de volver a llamar a la IA.
-   ============================================================ */
+/* Cache de ejercicios */
 const EXERCISES_STORAGE_KEY = 'estudio8_exercises_v1';
 
 function loadExerciseCache(){
@@ -544,9 +524,7 @@ function renderExerciseBox(box, s, subject, idx, rowId, ejercicio, respuesta, fr
     </button>`;
 }
 
-/* ============================================================
-   GENERADOR DE EJERCICIOS (Groq API — https://console.groq.com)
-   ============================================================ */
+/* Generador de ejercicios */
 async function generateExercise(subject, idx, rowId, forceNew){
   const s = SUBJECTS[subject];
   const [code, desc] = s.oas[idx];
@@ -634,9 +612,7 @@ function toggleOA(subject, idx){
   updateBadges();
 }
 
-/* ============================================================
-   BUSCADOR
-   ============================================================ */
+/* Buscador */
 document.getElementById('search').addEventListener('input', applySearch);
 function applySearch(){
   const q = document.getElementById('search').value.toLowerCase().trim();
@@ -646,9 +622,7 @@ function applySearch(){
 }
 function clearSearch(){ document.getElementById('search').value=''; applySearch(); }
 
-/* ============================================================
-   GRÁFICO GLOBAL (Chart.js)
-   ============================================================ */
+/* Grafico global */
 let globalChart;
 function updateGlobal(){
   let done=0, total=0;
@@ -664,9 +638,7 @@ function updateGlobal(){
   }
 }
 
-/* ============================================================
-   VISOR DE PDF (pdf.js) — busca el archivo junto al HTML
-   ============================================================ */
+/* Visor PDF*/
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 let pdfDoc = null, pdfPageNum = 1;
 
@@ -704,9 +676,7 @@ async function renderPdfPage(){
 function pdfNext(){ if(pdfDoc && pdfPageNum < pdfDoc.numPages){ pdfPageNum++; renderPdfPage(); } }
 function pdfPrev(){ if(pdfDoc && pdfPageNum > 1){ pdfPageNum--; renderPdfPage(); } }
 
-/* ============================================================
-   INIT
-   ============================================================ */
+/* INIT */
 renderTabs();
 renderContent();
 updateKeyStatusUI();
