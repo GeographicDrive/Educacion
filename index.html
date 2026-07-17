@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EduCenter</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="./Icon.png">
+<link rel="apple-touch-icon" href="./Icon.png">
 
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -681,6 +685,15 @@ renderTabs();
 renderContent();
 updateKeyStatusUI();
 showStorageWarningIfNeeded();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => console.log('SW registrado:', reg.scope))
+        .catch((err) => console.warn('Error registrando SW:', err));
+    });
+  }
 </script>
 </body>
 </html>
