@@ -42,6 +42,10 @@
         <p id="global-percent" class="text-xl font-bold">0%</p>
       </div>
       <div class="w-16 h-16"><canvas id="globalChart"></canvas></div>
+      <button onclick="openApiKeyModal()" title="Configuración de IA" class="relative text-3xl hover:opacity-80 transition-opacity">
+        <i class="fa-solid fa-gear"></i>
+        <span id="apikey-status-dot" class="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-red-400 border-2 border-white"></span>
+      </button>
     </div>
   </div>
 </header>
@@ -61,24 +65,30 @@
     <button onclick="clearSearch()" class="text-xs text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i> limpiar</button>
   </div>
 
-  <!-- Configuración API Key Groq -->
-  <div class="bg-white rounded-2xl shadow p-4">
-    <div class="flex items-center justify-between flex-wrap gap-2 cursor-pointer" onclick="document.getElementById('apikey-body').classList.toggle('hidden')">
-      <h3 class="font-title font-bold text-slate-700 flex items-center gap-2">
-        <i class="fa-solid fa-key text-yellow-500"></i> Configuración de IA (Groq API Key)
-      </h3>
-      <span id="apikey-status" class="text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-600">Sin configurar</span>
-    </div>
-    <div id="apikey-body" class="mt-3 space-y-2">
-      <p class="text-xs text-slate-500">
-        Consigue una API key gratis en <a href="https://console.groq.com/keys" target="_blank" class="text-indigo-600 underline">console.groq.com/keys</a>.
-        Se guarda solo en <b>este navegador</b> (localStorage), nunca se envía a nadie más que a Groq.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-2">
-        <input id="groq-key-input" type="password" placeholder="gsk_..." class="flex-1 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-indigo-400 outline-none text-sm">
-        <button onclick="toggleKeyVisibility()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm"><i class="fa-solid fa-eye" id="eye-icon"></i></button>
-        <button onclick="saveGroqKey()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
-        <button onclick="clearGroqKey()" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-semibold"><i class="fa-solid fa-trash"></i> Borrar</button>
+  <!-- Modal: Configuración API Key Groq -->
+  <div id="apikey-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50" onclick="closeApiKeyModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl p-5 w-full max-w-lg">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+        <h3 class="font-title font-bold text-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-key text-yellow-500"></i> Configuración de IA (Groq API Key)
+        </h3>
+        <div class="flex items-center gap-2">
+          <span id="apikey-status" class="text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-600">Sin configurar</span>
+          <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+      </div>
+      <div id="apikey-body" class="space-y-2">
+        <p class="text-xs text-slate-500">
+          Consigue una API key gratis en <a href="https://console.groq.com/keys" target="_blank" class="text-indigo-600 underline">console.groq.com/keys</a>.
+          Se guarda solo en <b>este navegador</b> (localStorage), nunca se envía a nadie más que a Groq.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="groq-key-input" type="password" placeholder="gsk_..." class="flex-1 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 focus:border-indigo-400 outline-none text-sm">
+          <button onclick="toggleKeyVisibility()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm"><i class="fa-solid fa-eye" id="eye-icon"></i></button>
+          <button onclick="saveGroqKey()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+          <button onclick="clearGroqKey()" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-semibold"><i class="fa-solid fa-trash"></i> Borrar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -450,15 +460,25 @@ function updateKeyStatusUI(){
   const key = getGroqKey();
   const status = document.getElementById('apikey-status');
   const input = document.getElementById('groq-key-input');
+  const dot = document.getElementById('apikey-status-dot');
   if(key){
     status.textContent = 'Configurada ✓';
     status.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700';
     input.value = key;
+    if(dot){ dot.classList.remove('bg-red-400'); dot.classList.add('bg-emerald-400'); }
   } else {
     status.textContent = 'Sin configurar';
     status.className = 'text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-600';
     input.value = '';
+    if(dot){ dot.classList.remove('bg-emerald-400'); dot.classList.add('bg-red-400'); }
   }
+}
+
+function openApiKeyModal(){
+  document.getElementById('apikey-modal').classList.remove('hidden');
+}
+function closeApiKeyModal(){
+  document.getElementById('apikey-modal').classList.add('hidden');
 }
 
 function saveGroqKey(){
@@ -472,7 +492,7 @@ function saveGroqKey(){
     const old = status.textContent;
     status.textContent = '¡Guardada! ✓';
     setTimeout(()=>{ status.textContent = old; }, 1500);
-    document.getElementById('apikey-body').classList.add('hidden');
+    closeApiKeyModal();
   } else {
     alert('No se pudo guardar la key de forma permanente en este navegador. Se usará solo durante esta sesión.');
   }
@@ -546,8 +566,8 @@ async function generateExercise(subject, idx, rowId, forceNew){
 
   if(!apiKey){
     box.innerHTML = `<p class="text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i>
-      Primero configura tu API key gratis de Groq arriba (sección "Configuración de IA").</p>
-      <button onclick="document.getElementById('apikey-body').classList.remove('hidden'); document.getElementById('apikey-body').scrollIntoView({behavior:'smooth'});"
+      Primero configura tu API key gratis de Groq (botón ⚙️ arriba a la derecha).</p>
+      <button onclick="openApiKeyModal();"
         class="mt-2 text-xs text-indigo-600 underline">Ir a configurar mi API key</button>`;
     return;
   }
